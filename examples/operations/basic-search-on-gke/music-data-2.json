@@ -1,0 +1,10 @@
+{
+    "put": "id:mynamespace:music::recovery",
+    "fields": {
+        "album": "Recovery",
+        "artist": "Eminem",
+        "title": "So Bad",
+        "year": 2010
+     }
+}
+

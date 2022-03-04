@@ -1,0 +1,44 @@
+# Copyright Yahoo. Licensed under the terms of the Apache 2.0 license. See LICENSE in the project root.
+
+urls:
+    - "https://raw.githubusercontent.com/vespa-engine/sample-apps/master/examples/document-processing/README.md"
+    - "https://raw.githubusercontent.com/vespa-engine/sample-apps/master/examples/predicate-fields/README.md"
+    - "https://raw.githubusercontent.com/vespa-engine/sample-apps/master/examples/operations/multinode/README.md"
+    - "https://raw.githubusercontent.com/vespa-engine/sample-apps/master/examples/generic-request-processing/README.md"
+    - "https://raw.githubusercontent.com/vespa-engine/sample-apps/master/examples/http-api-using-request-handlers-and-processors/README.md"
+    - "https://raw.githubusercontent.com/vespa-engine/sample-apps/master/examples/multiple-bundles/README.md"
+    - "https://raw.githubusercontent.com/vespa-engine/sample-apps/master/use-case-shopping/README.md"
+    - "https://raw.githubusercontent.com/vespa-engine/sample-apps/master/model-evaluation/README.md"
+    - "https://raw.githubusercontent.com/vespa-engine/sample-apps/master/examples/part-purchases-demo/README.md"
+    - "https://raw.githubusercontent.com/vespa-engine/sample-apps/master/examples/vespa-chinese-linguistics/README.md"
+    - "https://raw.githubusercontent.com/vespa-engine/sample-apps/master/incremental-search/search-as-you-type/README.md"
+    - "https://raw.githubusercontent.com/vespa-engine/sample-apps/master/incremental-search/search-suggestions/README.md"
+    - "https://raw.githubusercontent.com/vespa-engine/sample-apps/master/transformers/README.md"
+    - "https://raw.githubusercontent.com/vespa-engine/sample-apps/master/msmarco-ranking/passage-ranking.md"
+    - "https://raw.githubusercontent.com/vespa-engine/sample-apps/master/msmarco-ranking/document-ranking.md"
+    - "https://raw.githubusercontent.com/vespa-engine/sample-apps/master/dense-passage-retrieval-with-ann/README.md"
+    #
+    # Text image search is currently failing in mvn clean package:
+    - "https://raw.githubusercontent.com/vespa-engine/sample-apps/master/text-image-search/README.md"
+    #
+    # ToDo: move to other repo
+    # Test queries to https://api.cord19.vespa.ai/search/?query=sars-cov-2
+    - "https://raw.githubusercontent.com/vespa-cloud/cord-19-search/master/README.md"
+    # Test self-hosted deployment of cord-19. ToDo: feed a few sample documents
+    - "https://raw.githubusercontent.com/vespa-cloud/cord-19-search/master/experiment-yourself.md"
+    #
+    # ToDo: Move to other repo
+    - "https://raw.githubusercontent.com/vespa-cloud/vespa-documentation-search/master/README.md"
+
+    # multinode-HA uses too much memory for a TURBO instance in cd.screwdriver.cd,
+    # see https://docs.screwdriver.cd/user-guide/configuration/annotations
+    # The test works when running locally using
+    # test/test.py operations/multinode-HA/README.md
+    # - "https://raw.githubusercontent.com/vespa-engine/sample-apps/master/operations/multinode-HA/README.md"
+
+    # operations/album-recommendation-monitoring is tested in
+    # https://docs.vespa.ai/en/operations/monitoring.html#monitoring-with-grafana
+
+    # TBD:
+    # - operations/secure-vespa-with-mtls
+    # - operations/basic-search-on-gke

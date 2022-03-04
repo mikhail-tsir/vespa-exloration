@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright Yahoo. Licensed under the terms of the Apache 2.0 license. See LICENSE in the project root. -->
+ <services version="1.0" xmlns:deploy="vespa" xmlns:preprocess="properties">
+
+  <container id="default" version="1.0">
+
+    <nodes>
+      <node hostalias="node1"/>
+    </nodes>
+
+    <component id="com.yahoo.language.wordpiece.WordPieceEmbedder" bundle="linguistics-components">
+      <config name="language.wordpiece.word-piece">
+        <model>
+          <item>
+            <language>unknown</language>
+            <path>files/bert-base-uncased-vocab.txt</path>
+          </item>
+        </model>
+      </config>
+    </component>
+
+    <component id="ai.vespa.embedding.DenseEmbedder" bundle="msmarco">
+      <config name="ai.vespa.embedding.embedding">
+        <model_name>dense_encoder</model_name>
+        <max_query_length>32</max_query_length>
+        <max_document_length>256</max_document_length>
+      </config>
+    </component>
+
+    <document-processing>
+      <chain id="bert-tensorizer" inherits="indexing">
+        <documentprocessor id="ai.vespa.docproc.DocumentTensorizer" bundle="msmarco"/>
+        <documentprocessor id="ai.vespa.docproc.DenseDocumentEmbedder" bundle="msmarco"/>
+      </chain>
+    </document-processing>
+
+    <!-- stateless ML model evaluation for query encoding and
+     re-ranking -->
+    <model-evaluation>
+      <!-- Stateless model evaluation options
+      - latency versus cost/cpu usage -->
+      <onnx>
+        <models>
+          <model name="msmarco_v2">
+            <intraop-threads>8</intraop-threads>
+          </model>
+          <model name="dense_encoder">
+            <intraop-threads>2</intraop-threads>
+          </model>
+          <model name="colbert_encoder">
+            <intraop-threads>2</intraop-threads>
+          </model>
+        </models>
+      </onnx>
+    </model-evaluation>
+
+    <!-- Search chains -->
+    <search>
+      <chain id="docranking" inherits="vespa">
+        <searcher id="ai.vespa.searcher.RetrievalModelSearcher" bundle="msmarco"/>
+      </chain>
+
+      <chain id="passageranking" inherits="vespa">
+        <searcher id="ai.vespa.searcher.RetrievalModelSearcher" bundle="msmarco"/>
+        <searcher id="ai.vespa.searcher.QueryEncodingSearcher" bundle="msmarco"/>
+      </chain>
+      <!-- Chain for re-ranking in the stateless container layer -->
+      <chain id="passagereranking" inherits="vespa">
+        <searcher id="ai.vespa.searcher.RetrievalModelSearcher" bundle="msmarco"/>
+        <searcher id="ai.vespa.searcher.QueryEncodingSearcher" bundle="msmarco"/>
+        <searcher id="ai.vespa.searcher.ReRankingSearcher" bundle="msmarco"/>
+      </chain>
+
+      <chain id="passagerankingsimple" inherits="vespa">
+        <searcher id="ai.vespa.searcher.RetrievalModelSearcher" bundle="msmarco"/>
+      </chain>
+
+      <!-- Sub-chain invoked by QueryEncodingSearcher -->
+      <chain id="embedding">
+        <searcher id="ai.vespa.searcher.QueryEmbeddingSearcher" bundle="msmarco"/>
+      </chain>
+
+      <!-- Sub-chain invoked by QueryEncodingSearcher -->
+      <chain id="colbert">
+        <searcher id="ai.vespa.searcher.colbert.ColBERTSearcher" bundle="msmarco">
+          <config name="ai.vespa.colbert.colbert">
+            <max_query_length>32</max_query_length>
+            <dim>32</dim>
+          </config>
+        </searcher>
+      </chain>
+    </search>
+    <document-api/>
+  </container>
+
+  <content id="msmarco" version="1.0">
+    <redundancy>2</redundancy>
+    <documents>
+      <document mode="index" type="doc"/>
+      <document mode="index" type="passage"/>
+      <document-processing cluster="default" chain="bert-tensorizer"/>
+    </documents>
+    <nodes>
+      <!-- Multi node scaling -->
+      <node hostalias="node1" distribution-key="0"/>
+    </nodes>
+    <engine>
+      <proton>
+        <tuning>
+          <searchnode>
+            <requestthreads>
+              <persearch>24</persearch>
+            </requestthreads>
+            <feeding>
+              <concurrency>1.0</concurrency>
+            </feeding>
+          </searchnode>
+        </tuning>
+      </proton>
+    </engine>
+  </content>
+
+</services>
